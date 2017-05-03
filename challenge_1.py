@@ -50,130 +50,101 @@ Use verify [file] to test your solution and see how it does. When you are finish
 """
 
 
-def sqrt(n: int, precision: (float, int)) -> int:
-	"""
-	This function returns the square root of a positive integer.
-
-	:param n: an integer
-	:param precision: precision of the result
-	:return: the square root of the input integer
-	"""
-
-	# Validate input type
-	if not isinstance(n, int):
-		raise TypeError("Input param `n` must be of type int. Got an {}".format(
-			type(n)
-		))
-	if not isinstance(precision, (int, float)):
-		raise TypeError("Input param `precision` must be of type int or float. Got an {}".format(
-			type(n)
-		))
-
-	# Validate input value
-	if n < 1:
-		raise ValueError("Input param `n` must be a positive integer.")
-
-	# Base case
-	if n == 1:
-		return 1
-
-	# Initial setup for upper and lower bounds for Newton's method
-	low, high = 1, n
-
-	while abs(low-high) > precision:
-
-		# Recalculate mid point
-		mid = (high + low) / 2
-		print(mid)
-
-		# CASE 1: current result is too large
-		if mid*mid > n:
-			high = mid # update new upper bound to be mid point
-
-		# CASE 2: current result is too low
-		else:
-			low = mid # update new lower bound to be mid point
-
-	return int(round(mid, 0))
-
-
-
-
-def answer(area: int) -> list:
-	"""
-	Write a function answer(area) that takes as its input a single unit of measure
-	representing the total area of solar panels you have (between 1 and 1000000 inclusive)
-	and returns a list of the areas of the largest squares you could make out of those panels,
-	starting with the largest squares first. So, following the example above, answer(12) would
-	return [9, 1, 1, 1].
-
-	:param area: single unit of measure representing the total area of solar panels you have (between 1 and 1000000 inclusive)
-	:return: a list of the areas of the largest squares you could make out of those panels, starting with the largest squares first
-	"""
-
-	if area == 0:
-		yield
-
-
-
-def factorial(x):
-    print("x", x)
-    if x <= 1:
-        print("base case, returning 1")
-        yield 1
-    else:
-        sub_fact = factorial(x-1)
-        print("factorial(x-1)", sub_fact)
-        result = x * sub_fact
-        print("return", result)
-        yield result
-
-g = factorial(9)
-for i in g:
-	print(g)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+def sqrt(n, precision, debug=False):
+    """
+    This function returns the square root of a positive integer.
+    
+    :param n: an integer
+    :param precision: precision of the result
+    :return: the square root of the input integer
+    """
+    
+    # Validate input type
+    if not isinstance(n, int):
+        raise TypeError("Input param `n` must be of type int. Got an {}".format(
+            type(n)
+    ))
+    if not isinstance(precision, (int, float)):
+        raise TypeError("Input param `precision` must be of type int or float. Got an {}".format(
+            type(n)
+    ))
+    
+    # Validate input value
+    if n < 1:
+        raise ValueError("Input param `n` must be a positive integer.")
+    
+    # Base case
+    if n == 1:
+        return 1
+    
+    # Initial setup for upper and lower bounds for Newton's method
+    low, high = 1, n
+    
+    while abs(low-high) > precision:
+    
+        # Recalculate mid point
+        mid = (high + low) / 2.0
+        if debug: 
+            print "mid: "+str(mid)
+    
+        # CASE 1: current result is too large
+        if mid*mid > n:
+            high = mid # update new upper bound to be mid point
+    
+        # CASE 2: current result is too low
+        else:
+            low = mid # update new lower bound to be mid point
+    
+    return mid
+
+
+def answer(area):
+    """
+    This function takes as its input a single unit of measure
+    representing the total area of solar panels you have (between 1 and 1000000 inclusive)
+    and returns a list of the areas of the largest squares you could make out of those panels,
+    starting with the largest squares first. So, following the example above, answer(12) would
+    return [9, 1, 1, 1].
+    
+    :param area: single unit of measure representing the total area of solar panels you have (between 1 and 1000000 inclusive)
+    :return: a list of the areas of the largest squares you could make out of those panels, starting with the largest squares first
+    """
+    
+    # Initialize empty container for results
+    response = []
+
+    # Validate lower bound contraint
+    if area < 1:
+        return response
+
+    # Iteratively find maximum size sub-squares
+    while area > 0:
+        # Get an estimate of the current area square root.
+        # Note that precision DOES NOT need to be high since we are
+        # only interested in integer values.
+        current_max = int(round(sqrt(area, 0.1),0))
+
+        # Sometime because of error/imprecision in sqrt() calculation
+        # the rounded estimated square root squared might higher
+        # than the initial area.
+        if current_max**2 > area:
+            # Update `current_max` if limit is violated
+            current_max = current_max - 1
+      
+        # Append result to result container
+        response.append(current_max**2)  
+        
+        # Update area to be the remaining area
+        area = area - current_max**2
+        
+    return response
+    
+
+
+
+#error_cases = []
+#for i in range(1,1000000):
+#    print "PROCESSING : " + str(i)
+#    ans = answer(i)
+#    if sum(ans) != i:
+#        error_cases.append(i)
